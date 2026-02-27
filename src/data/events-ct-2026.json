@@ -1,0 +1,134 @@
+[
+  {
+    "id": "bells-beach-2026",
+    "name": "Rip Curl Pro Bells Beach",
+    "location": "Bells Beach, Victoria",
+    "country": "AU",
+    "startDate": "2026-04-01",
+    "endDate": "2026-04-11",
+    "status": "upcoming",
+    "isPipeline": false,
+    "round": 1
+  },
+  {
+    "id": "margaret-river-2026",
+    "name": "Western Australia Pro",
+    "location": "Margaret River, Western Australia",
+    "country": "AU",
+    "startDate": "2026-04-17",
+    "endDate": "2026-04-27",
+    "status": "upcoming",
+    "isPipeline": false,
+    "round": 2
+  },
+  {
+    "id": "snapper-rocks-2026",
+    "name": "Queensland Pro",
+    "location": "Snapper Rocks, Gold Coast",
+    "country": "AU",
+    "startDate": "2026-05-02",
+    "endDate": "2026-05-12",
+    "status": "upcoming",
+    "isPipeline": false,
+    "round": 3
+  },
+  {
+    "id": "el-salvador-2026",
+    "name": "Corona El Salvador Pro",
+    "location": "Punta Roca, La Libertad",
+    "country": "SV",
+    "startDate": "2026-05-28",
+    "endDate": "2026-06-07",
+    "status": "upcoming",
+    "isPipeline": false,
+    "round": 4
+  },
+  {
+    "id": "rio-pro-2026",
+    "name": "Oi Rio Pro",
+    "location": "Saquarema, Rio de Janeiro",
+    "country": "BR",
+    "startDate": "2026-06-12",
+    "endDate": "2026-06-20",
+    "status": "upcoming",
+    "isPipeline": false,
+    "round": 5
+  },
+  {
+    "id": "jbay-2026",
+    "name": "Corona Open J-Bay",
+    "location": "Jeffreys Bay, Eastern Cape",
+    "country": "ZA",
+    "startDate": "2026-07-10",
+    "endDate": "2026-07-20",
+    "status": "upcoming",
+    "isPipeline": false,
+    "round": 6
+  },
+  {
+    "id": "tahiti-2026",
+    "name": "Shiseido Tahiti Pro",
+    "location": "Teahupo'o, Tahiti",
+    "country": "PF",
+    "startDate": "2026-08-08",
+    "endDate": "2026-08-18",
+    "status": "upcoming",
+    "isPipeline": false,
+    "round": 7
+  },
+  {
+    "id": "cloudbreak-2026",
+    "name": "Fiji Pro",
+    "location": "Cloudbreak, Tavarua",
+    "country": "FJ",
+    "startDate": "2026-08-25",
+    "endDate": "2026-09-04",
+    "status": "upcoming",
+    "isPipeline": false,
+    "round": 8
+  },
+  {
+    "id": "lower-trestles-2026",
+    "name": "Rip Curl WSL Finals",
+    "location": "Lower Trestles, San Clemente",
+    "country": "US",
+    "startDate": "2026-09-11",
+    "endDate": "2026-09-20",
+    "status": "upcoming",
+    "isPipeline": false,
+    "round": 9
+  },
+  {
+    "id": "abu-dhabi-2026",
+    "name": "Surf Abu Dhabi Pro",
+    "location": "Hudayriyat Island, Abu Dhabi",
+    "country": "AE",
+    "startDate": "2026-10-14",
+    "endDate": "2026-10-18",
+    "status": "upcoming",
+    "isPipeline": false,
+    "round": 10
+  },
+  {
+    "id": "portugal-2026",
+    "name": "MEO Rip Curl Pro Portugal",
+    "location": "Supertubos, Peniche",
+    "country": "PT",
+    "startDate": "2026-10-22",
+    "endDate": "2026-11-01",
+    "status": "upcoming",
+    "isPipeline": false,
+    "round": 11
+  },
+  {
+    "id": "pipe-masters-2026",
+    "name": "Pipe Masters",
+    "location": "Banzai Pipeline, North Shore, Oahu",
+    "country": "US",
+    "startDate": "2026-12-08",
+    "endDate": "2026-12-20",
+    "status": "upcoming",
+    "isPipeline": true,
+    "round": 12
+  }
+]

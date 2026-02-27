@@ -1,15 +1,25 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-
-// Pages serão adicionadas na Fase 1 (UI Agent)
-// Por ora, placeholder mínimo para o app compilar
+import { Header } from '@/components/layout/Header'
+import { BottomNav } from '@/components/layout/BottomNav'
+import { RankingsPage } from '@/pages/RankingsPage'
+import { SimulatorPage } from '@/pages/SimulatorPage'
+import { CalendarPage } from '@/pages/CalendarPage'
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<div className="p-4 text-text-1">Cutline — setup OK ✓</div>} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
+        <Header />
+        <main>
+          <Routes>
+            <Route path="/" element={<RankingsPage />} />
+            <Route path="/simulator" element={<SimulatorPage />} />
+            <Route path="/calendar" element={<CalendarPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+        <BottomNav />
+      </div>
     </BrowserRouter>
   )
 }
