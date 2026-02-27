@@ -4,8 +4,11 @@ import { BottomNav } from '@/components/layout/BottomNav'
 import { RankingsPage } from '@/pages/RankingsPage'
 import { SimulatorPage } from '@/pages/SimulatorPage'
 import { CalendarPage } from '@/pages/CalendarPage'
+import { useAdSense } from '@/hooks/useAdSense'
 
 function App() {
+  useAdSense()
+
   return (
     <BrowserRouter>
       <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
