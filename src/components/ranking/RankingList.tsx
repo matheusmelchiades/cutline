@@ -1,9 +1,9 @@
 import { PodiumTop3 } from '@/components/ranking/PodiumTop3'
 import { RankingRow } from '@/components/ranking/RankingRow'
-import type { MockRankedSurfer } from '@/types/mock'
+import type { RankedSurfer } from '@/engine/types'
 
 interface RankingListProps {
-  rankings: MockRankedSurfer[]
+  rankings: RankedSurfer[]
   onSurferClick: (id: string) => void
 }
 

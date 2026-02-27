@@ -1,9 +1,9 @@
 import { cn } from '@/lib/cn'
 import { formatPoints } from '@/lib/format'
-import type { MockRankedSurfer } from '@/types/mock'
+import type { RankedSurfer } from '@/engine/types'
 
 interface PodiumTop3Props {
-  top3: MockRankedSurfer[]
+  top3: RankedSurfer[]
 }
 
 const MEDALS = ['\u{1F947}', '\u{1F948}', '\u{1F949}'] as const
@@ -13,7 +13,7 @@ function PodiumItem({
   ranked,
   isCenter,
 }: {
-  ranked: MockRankedSurfer
+  ranked: RankedSurfer
   isCenter: boolean
 }) {
   const idx = ranked.rank - 1

@@ -1,8 +1,8 @@
 import { EventCard } from '@/components/calendar/EventCard'
-import type { MockEvent } from '@/types/mock'
+import type { Event } from '@/engine/types'
 
 interface EventListProps {
-  events: MockEvent[]
+  events: Event[]
 }
 
 export function EventList({ events }: EventListProps) {

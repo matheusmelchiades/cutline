@@ -1,19 +1,14 @@
 import { PageContainer } from '@/components/layout/PageContainer'
 import { AdSidebar } from '@/components/ads/AdSidebar'
-import { MOCK_EVENTS } from '@/types/mock'
+import { useRankingStore } from '@/stores/ranking-store'
 import { formatDate } from '@/lib/format'
 
 export function SimulatorPage() {
-  const upcomingEvents = MOCK_EVENTS.filter((e) => e.status === 'upcoming')
+  const { events } = useRankingStore()
+  const upcomingEvents = events.filter((e) => e.status === 'upcoming')
 
   return (
-    <PageContainer
-      sidebar={
-        <div className="space-y-6">
-          <AdSidebar />
-        </div>
-      }
-    >
+    <PageContainer sidebar={<AdSidebar />}>
       <h1 className="mb-6 text-2xl font-bold text-text-1">
         Scenario Simulator
       </h1>

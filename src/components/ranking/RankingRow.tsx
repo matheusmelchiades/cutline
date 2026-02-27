@@ -1,10 +1,10 @@
 import { cn } from '@/lib/cn'
 import { formatPoints, formatDelta } from '@/lib/format'
 import { StatusBadge } from '@/components/ranking/StatusBadge'
-import type { MockRankedSurfer } from '@/types/mock'
+import type { RankedSurfer } from '@/engine/types'
 
 interface RankingRowProps {
-  ranked: MockRankedSurfer
+  ranked: RankedSurfer
   onClick: () => void
 }
 

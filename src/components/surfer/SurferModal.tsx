@@ -1,10 +1,10 @@
 import { X } from 'lucide-react'
 import { formatPoints } from '@/lib/format'
 import { StatusBadge } from '@/components/ranking/StatusBadge'
-import type { MockRankedSurfer } from '@/types/mock'
+import type { RankedSurfer } from '@/engine/types'
 
 interface SurferModalProps {
-  surfer: MockRankedSurfer | null
+  surfer: RankedSurfer | null
   onClose: () => void
 }
 

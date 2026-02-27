@@ -1,13 +1,13 @@
 import { cn } from '@/lib/cn'
 import { formatDate } from '@/lib/format'
-import type { MockEvent } from '@/types/mock'
+import type { Event } from '@/engine/types'
 
 interface EventCardProps {
-  event: MockEvent
+  event: Event
 }
 
 const EVENT_STATUS_CONFIG: Record<
-  MockEvent['status'],
+  Event['status'],
   { label: string; classes: string }
 > = {
   completed: {
