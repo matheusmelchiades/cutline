@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+
+# Environment variables — NEVER commit these
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+
+# Build output
+dist/
+build/
+.cache/
+
+# Test coverage
+coverage/
+
+# Deployment
+.vercel
+
+# Supabase local config (may contain service_role keys)
+supabase/.env
+supabase/.branches/
+supabase/.temp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Private keys / certificates
+*.pem
+*.key
+*.p8
+*.p12
+*.pfx

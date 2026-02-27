@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cutline — WSL Scenario Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-primary: #0B1120;
+  --bg-secondary: #111827;
+  --bg-tertiary: #1E293B;
+  --bg-elevated: #1A2744;
+  --brand-500: #0EA5E9;
+  --brand-400: #38BDF8;
+  --brand-600: #0284C7;
+  --brand-300: #7DD3FC;
+  --accent-primary: #F97316;
+  --accent-secondary: #FBBF24;
+  --status-classified: #10B981;
+  --status-risk: #F59E0B;
+  --status-eliminated: #EF4444;
+  --status-live: #EF4444;
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-tertiary: #64748B;
+  --rank-gold: #FFD700;
+  --rank-silver: #C0C0C0;
+  --rank-bronze: #CD7F32;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+  font-feature-settings: 'tnum' 1;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  body { display: flex; justify-content: center; background: #060B14; }
+  .app { max-width: 1280px; }
+  .desktop-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
+  .mobile-only { display: none !important; }
+  .desktop-only { display: block !important; }
+}
+
+.desktop-only { display: none; }
+
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  position: sticky; top: 0; z-index: 50;
+}
+
+.header-logo { display: flex; align-items: center; gap: 8px; }
+
+.logo-icon {
+  width: 32px; height: 32px; border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #0EA5E9, #06B6D4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+
+.logo-text { font-weight: 800; font-size: 18px; letter-spacing: -0.5px; }
+.logo-text span { color: var(--brand-400); }
+.header-actions { display: flex; gap: 8px; align-items: center; }
+
+.header-btn {
+  width: 36px; height: 36px; border-radius: var(--radius-sm);
+  background: var(--bg-tertiary); border: none; color: var(--text-secondary);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 16px; transition: all 150ms;
+}
+.header-btn:hover { background: var(--bg-elevated); color: var(--text-primary); }
+
+.ad-banner {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  padding: 6px 16px;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 50px;
+}
+
+.ad-banner-inner {
+  background: var(--bg-tertiary);
+  border: 1px dashed rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  padding: 8px 24px;
+  font-size: 11px; color: var(--text-tertiary);
+  text-transform: uppercase; letter-spacing: 1px;
+}
+
+.filters-bar {
+  padding: 12px 16px 8px;
+  display: flex; gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.filters-bar::-webkit-scrollbar { display: none; }
+
+.pill-group {
+  display: flex;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-full);
+  padding: 3px;
+  flex-shrink: 0;
+}
+
+.pill {
+  padding: 7px 16px;
+  border-radius: var(--radius-full);
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 200ms;
+  white-space: nowrap;
+}
+
+.pill.active { background: var(--brand-500); color: white; }
+.pill:not(.active) { background: transparent; color: var(--text-secondary); }
+.pill:not(.active):hover { color: var(--text-primary); }
+
+.podium-section {
+  padding: 20px 16px 12px;
+  background: linear-gradient(180deg, rgba(14,165,233,0.08) 0%, transparent 100%);
+}
+
+.podium-title {
+  font-size: 11px; font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase; letter-spacing: 1.5px;
+  margin-bottom: 16px;
+}
+
+.podium {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+  padding-bottom: 8px;
+}
+
+.podium-item {
+  display: flex; flex-direction: column; align-items: center;
+  cursor: pointer; transition: transform 200ms;
+}
+.podium-item:hover { transform: translateY(-4px); }
+.podium-item.first { order: 2; }
+.podium-item.second { order: 1; }
+.podium-item.third { order: 3; }
+
+.podium-avatar {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  border: 3px solid var(--text-tertiary);
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 700;
+  position: relative;
+}
+
+.podium-item.first .podium-avatar { width: 72px; height: 72px; border-color: var(--rank-gold); font-size: 28px; }
+.podium-item.second .podium-avatar { border-color: var(--rank-silver); }
+.podium-item.third .podium-avatar { border-color: var(--rank-bronze); }
+
+.podium-avatar-bg {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+}
+
+.podium-medal {
+  position: absolute; bottom: -4px; right: -4px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800;
+  border: 2px solid var(--bg-primary);
+}
+
+.podium-item.first .podium-medal { background: var(--rank-gold); color: #000; }
+.podium-item.second .podium-medal { background: var(--rank-silver); color: #000; }
+.podium-item.third .podium-medal { background: var(--rank-bronze); color: #fff; }
+
+.podium-name { font-size: 13px; font-weight: 700; margin-top: 8px; text-align: center; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.podium-country { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+.podium-points { font-size: 15px; font-weight: 800; color: var(--brand-400); margin-top: 4px; }
+.podium-pts-label { font-size: 10px; color: var(--text-tertiary); font-weight: 500; }
+
+.ranking-section { padding: 0 16px; flex: 1; }
+
+.ranking-row {
+  display: grid;
+  grid-template-columns: 32px 40px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  cursor: pointer;
+  transition: background 150ms;
+  border-radius: var(--radius-sm);
+  margin: 0 -8px;
+}
+.ranking-row:hover { background: rgba(255,255,255,0.03); }
+
+.rank-number { font-size: 14px; font-weight: 800; text-align: center; color: var(--text-tertiary); }
+.rank-number.top-1 { color: var(--rank-gold); }
+.rank-number.top-2 { color: var(--rank-silver); }
+.rank-number.top-3 { color: var(--rank-bronze); }
+
+.rank-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.rank-info { min-width: 0; }
+.rank-name { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rank-meta { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.rank-country { font-size: 12px; color: var(--text-tertiary); }
+
+.rank-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.rank-points { font-size: 16px; font-weight: 700; font-feature-settings: 'tnum' 1; }
+.rank-change { display: flex; align-items: center; gap: 2px; font-size: 11px; font-weight: 600; }
+.rank-change.up { color: var(--status-classified); }
+.rank-change.down { color: var(--status-eliminated); }
+.rank-change.same { color: var(--text-tertiary); }
+
+.rank-status {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.rank-status.classified { background: rgba(16,185,129,0.12); color: var(--status-classified); border: 1px solid rgba(16,185,129,0.25); }
+.rank-status.risk { background: rgba(245,158,11,0.12); color: var(--status-risk); border: 1px solid rgba(245,158,11,0.25); }
+.rank-status.eliminated { background: rgba(239,68,68,0.12); color: var(--status-eliminated); border: 1px solid rgba(239,68,68,0.25); }
+
+.ad-infeed {
+  margin: 8px 0;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; gap: 12px;
+}
+
+.ad-infeed-img {
+  width: 60px; height: 60px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; flex-shrink: 0;
+}
+
+.ad-infeed-content { flex: 1; min-width: 0; }
+.ad-infeed-label { font-size: 9px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.ad-infeed-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.ad-infeed-desc { font-size: 11px; color: var(--text-tertiary); }
+
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--bg-secondary);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px));
+  z-index: 100;
+}
+
+@media (min-width: 1024px) { .bottom-nav { display: none; } }
+
+.nav-item {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 4px; padding: 4px 0;
+  cursor: pointer; border: none; background: none;
+  font-family: inherit; transition: all 200ms;
+}
+
+.nav-icon { font-size: 20px; color: var(--text-tertiary); transition: color 200ms; }
+.nav-label { font-size: 10px; font-weight: 600; color: var(--text-tertiary); transition: color 200ms; }
+.nav-item.active .nav-icon { color: var(--brand-500); }
+.nav-item.active .nav-label { color: var(--brand-400); }
+.nav-item.active::after { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--brand-500); margin-top: 2px; }
+
+.page { display: none; flex: 1; padding-bottom: 80px; }
+.page.active { display: flex; flex-direction: column; }
+
+.sim-header { padding: 20px 16px 12px; }
+.sim-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.sim-subtitle { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+
+.sim-card {
+  margin: 8px 16px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-lg);
+}
+
+.sim-card-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+
+.sim-event-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.sim-event-row:last-child { border-bottom: none; }
+.sim-event-name { font-size: 13px; font-weight: 500; }
+.sim-event-name .location { font-size: 11px; color: var(--text-tertiary); display: block; }
+.sim-event-name .multiplier { display: inline-block; padding: 1px 6px; background: rgba(249,115,22,0.15); color: var(--accent-primary); border-radius: var(--radius-full); font-size: 10px; font-weight: 700; margin-left: 6px; }
+
+.sim-select {
+  padding: 6px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; min-width: 100px; text-align: center;
+}
+.sim-select:focus { outline: 2px solid var(--brand-500); outline-offset: 2px; }
+.sim-select option { background: var(--bg-elevated); }
+
+.sim-results {
+  margin: 12px 16px; padding: 16px;
+  background: linear-gradient(135deg, rgba(14,165,233,0.08), rgba(6,182,212,0.05));
+  border: 1px solid rgba(14,165,233,0.15);
+  border-radius: var(--radius-lg);
+}
+
+.sim-results-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.sim-result-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; font-size: 13px; }
+.sim-result-name { font-weight: 600; }
+.sim-result-pts { font-weight: 700; font-feature-settings: 'tnum' 1; }
+.sim-result-delta { font-size: 12px; font-weight: 600; }
+.sim-result-delta.up { color: var(--status-classified); }
+.sim-result-delta.down { color: var(--status-eliminated); }
+
+.calendar-header { padding: 20px 16px 12px; }
+.calendar-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.calendar-subtitle { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+
+.event-card {
+  margin: 6px 16px; padding: 14px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 12px; align-items: center;
+  cursor: pointer; transition: all 200ms;
+}
+.event-card:hover { border-color: rgba(255,255,255,0.12); background: var(--bg-elevated); }
+.event-card.live { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.05); }
+.event-card.pipeline { border-color: rgba(249,115,22,0.3); background: rgba(249,115,22,0.05); }
+
+.event-number {
+  width: 44px; height: 44px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 800; color: var(--text-secondary);
+}
+.event-card.live .event-number { background: rgba(239,68,68,0.15); color: var(--status-live); }
+.event-card.pipeline .event-number { background: rgba(249,115,22,0.15); color: var(--accent-primary); }
+
+.event-info { min-width: 0; }
+.event-name { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.event-location { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
+.event-date { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+
+.event-badge {
+  padding: 3px 8px; border-radius: var(--radius-full);
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.event-badge.completed { background: rgba(107,114,128,0.15); color: #6B7280; }
+.event-badge.live { background: rgba(239,68,68,0.15); color: var(--status-live); animation: pulse-live 2s infinite; }
+.event-badge.upcoming { background: rgba(14,165,233,0.15); color: var(--brand-400); }
+.event-badge.pipeline-badge { background: rgba(249,115,22,0.15); color: var(--accent-primary); }
+
+@keyframes pulse-live { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+  z-index: 200; align-items: flex-end; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+
+.modal-sheet {
+  width: 100%; max-width: 480px; max-height: 85vh;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  overflow-y: auto; animation: slideUp 300ms ease-out;
+}
+
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+.modal-handle { width: 40px; height: 4px; background: var(--text-tertiary); border-radius: 2px; margin: 12px auto 0; }
+
+.modal-surfer-header {
+  padding: 20px; display: flex; align-items: center; gap: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.modal-avatar {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--bg-tertiary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; font-weight: 700; flex-shrink: 0;
+}
+
+.modal-name { font-size: 20px; font-weight: 800; }
+.modal-country { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+
+.modal-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: rgba(255,255,255,0.04);
+  margin: 16px 20px 0; border-radius: var(--radius-md); overflow: hidden;
+}
+
+.modal-stat { background: var(--bg-secondary); padding: 14px 12px; text-align: center; }
+.modal-stat-value { font-size: 20px; font-weight: 800; color: var(--brand-400); font-feature-settings: 'tnum' 1; }
+.modal-stat-label { font-size: 10px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+
+.modal-scenarios { padding: 20px; }
+.modal-scenario-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+
+.scenario-bar { margin-bottom: 12px; }
+.scenario-bar-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.scenario-bar-label { font-size: 12px; color: var(--text-secondary); }
+.scenario-bar-value { font-size: 12px; font-weight: 700; }
+.scenario-bar-track { height: 6px; background: var(--bg-tertiary); border-radius: 3px; overflow: hidden; }
+.scenario-bar-fill { height: 100%; border-radius: 3px; transition: width 600ms ease-out; }
+.scenario-bar-fill.high { background: var(--status-classified); }
+.scenario-bar-fill.medium { background: var(--status-risk); }
+.scenario-bar-fill.low { background: var(--status-eliminated); }
+
+@media (min-width: 1024px) {
+  .header { padding: 12px 24px; max-width: 1280px; margin: 0 auto; width: 100%; }
+  .desktop-nav { display: flex; gap: 4px; }
+  .desktop-nav-item { padding: 8px 20px; border-radius: var(--radius-full); border: none; background: none; color: var(--text-secondary); font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 200ms; }
+  .desktop-nav-item:hover { color: var(--text-primary); }
+  .desktop-nav-item.active { background: var(--brand-500); color: white; }
+  .desktop-sidebar { position: sticky; top: 60px; display: flex; flex-direction: column; gap: 16px; padding-top: 12px; }
+  .sidebar-card { background: var(--bg-secondary); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius-lg); padding: 16px; }
+  .sidebar-card-title { font-size: 13px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .sidebar-stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 13px; }
+  .sidebar-stat-row:last-child { border-bottom: none; }
+  .sidebar-ad { background: var(--bg-secondary); border: 1px dashed rgba(255,255,255,0.08); border-radius: var(--radius-lg); height: 250px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="header">
+    <div class="header-logo">
+      <div class="logo-icon">🌊</div>
+      <div class="logo-text">Surf<span>Calc</span></div>
+    </div>
+    <div class="desktop-nav desktop-only" id="desktopNav">
+      <button class="desktop-nav-item active" data-page="rankings">Rankings</button>
+      <button class="desktop-nav-item" data-page="simulator">Simulator</button>
+      <button class="desktop-nav-item" data-page="calendar">Calendar</button>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn" title="Search">🔍</button>
+      <button class="header-btn" title="Settings">⚙️</button>
+    </div>
+  </header>
+
+  <div class="ad-banner mobile-only">
+    <div class="ad-banner-inner">Ad · 320×50</div>
+  </div>
+
+  <!-- RANKINGS PAGE -->
+  <div class="page active" id="page-rankings">
+    <div class="filters-bar">
+      <div class="pill-group">
+        <button class="pill active" data-tour="ct">Championship Tour</button>
+        <button class="pill" data-tour="cs">Challenger Series</button>
+      </div>
+      <div class="pill-group">
+        <button class="pill active" data-gender="m">Men</button>
+        <button class="pill" data-gender="f">Women</button>
+      </div>
+    </div>
+
+    <div class="desktop-layout">
+      <div>
+        <div class="podium-section">
+          <div class="podium-title">Season Leaders — 2026 CT</div>
+          <div class="podium">
+            <div class="podium-item second" onclick="openSurfer(1)">
+              <div class="podium-avatar"><div class="podium-avatar-bg">GM</div><div class="podium-medal">2</div></div>
+              <div class="podium-name">G. Medina</div>
+              <div class="podium-country">🇧🇷 BRA</div>
+              <div class="podium-points">52,430</div>
+              <div class="podium-pts-label">pts</div>
+            </div>
+            <div class="podium-item first" onclick="openSurfer(0)">
+              <div class="podium-avatar"><div class="podium-avatar-bg">JF</div><div class="podium-medal">1</div></div>
+              <div class="podium-name">J.J. Florence</div>
+              <div class="podium-country">🇺🇸 HAW</div>
+              <div class="podium-points">58,165</div>
+              <div class="podium-pts-label">pts</div>
+            </div>
+            <div class="podium-item third" onclick="openSurfer(2)">
+              <div class="podium-avatar"><div class="podium-avatar-bg">GC</div><div class="podium-medal">3</div></div>
+              <div class="podium-name">G. Colapinto</div>
+              <div class="podium-country">🇺🇸 USA</div>
+              <div class="podium-points">49,850</div>
+              <div class="podium-pts-label">pts</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ranking-section" id="rankingList"></div>
+      </div>
+
+      <div class="desktop-sidebar desktop-only">
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">Quick Stats</div>
+          <div class="sidebar-stat-row"><span style="color:var(--text-secondary)">Events completed</span><span style="font-weight:700">7 / 12</span></div>
+          <div class="sidebar-stat-row"><span style="color:var(--text-secondary)">Next event</span><span style="font-weight:700">Tahiti Pro</span></div>
+          <div class="sidebar-stat-row"><span style="color:var(--text-secondary)">Post-season cutoff</span><span style="font-weight:700;color:var(--status-risk)">Top 24</span></div>
+          <div class="sidebar-stat-row"><span style="color:var(--text-secondary)">Eliminated</span><span style="font-weight:700;color:var(--status-eliminated)">4 surfers</span></div>
+        </div>
+        <div class="sidebar-ad">Ad · 300×250</div>
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">🔥 Hot Scenarios</div>
+          <div class="sidebar-stat-row"><span style="color:var(--text-secondary)">If Medina wins Tahiti...</span><span style="font-weight:600;color:var(--status-classified)">+2 spots</span></div>
+          <div class="sidebar-stat-row"><span style="color:var(--text-secondary)">If Toledo loses R16...</span><span style="font-weight:600;color:var(--status-eliminated)">Eliminated</span></div>
+          <div class="sidebar-stat-row"><span style="color:var(--text-secondary)">Closest battle</span><span style="font-weight:600;color:var(--status-risk)">Ewing vs Igarashi</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIMULATOR PAGE -->
+  <div class="page" id="page-simulator">
+    <div class="sim-header">
+      <div class="sim-title">Scenario Simulator</div>
+      <div class="sim-subtitle">Select hypothetical results and see who qualifies</div>
+    </div>
+    <div class="filters-bar">
+      <div class="pill-group">
+        <button class="pill active">Title Race</button>
+        <button class="pill">Post-Season Cut</button>
+        <button class="pill">CS Qualification</button>
+      </div>
+    </div>
+    <div class="sim-card">
+      <div class="sim-card-title">📊 Surfer: <strong>Gabriel Medina</strong></div>
+      <div class="sim-event-row">
+        <div class="sim-event-name">Tahiti Pro<span class="location">Teahupo'o</span></div>
+        <select class="sim-select" onchange="updateSimulation()">
+          <option value="">Select...</option><option value="1">🥇 1st (10,000)</option><option value="2">🥈 2nd (7,800)</option><option value="3" selected>🥉 3rd (6,085)</option><option value="5">5th (4,745)</option><option value="9">9th (3,320)</option>
+        </select>
+      </div>
+      <div class="sim-event-row">
+        <div class="sim-event-name">J-Bay Open<span class="location">Jeffreys Bay</span></div>
+        <select class="sim-select" onchange="updateSimulation()">
+          <option value="">Select...</option><option value="1">🥇 1st (10,000)</option><option value="2" selected>🥈 2nd (7,800)</option><option value="3">🥉 3rd (6,085)</option><option value="5">5th (4,745)</option><option value="9">9th (3,320)</option>
+        </select>
+      </div>
+      <div class="sim-event-row">
+        <div class="sim-event-name">Pipe Masters<span class="location">Pipeline, Oahu <span class="multiplier">1.5×</span></span></div>
+        <select class="sim-select" onchange="updateSimulation()">
+          <option value="">Select...</option><option value="1">🥇 1st (15,000)</option><option value="2">🥈 2nd (11,700)</option><option value="3" selected>🥉 3rd (9,128)</option><option value="5">5th (7,118)</option><option value="9">9th (4,980)</option>
+        </select>
+      </div>
+    </div>
+    <div class="sim-results">
+      <div class="sim-results-title">📈 Projected Final Rankings</div>
+      <div class="sim-result-row"><span class="sim-result-name">1. J.J. Florence</span><span class="sim-result-pts" style="color:var(--rank-gold)">85,420</span><span class="sim-result-delta same">—</span></div>
+      <div class="sim-result-row"><span class="sim-result-name" style="color:var(--brand-400)">2. Gabriel Medina ★</span><span class="sim-result-pts" style="color:var(--brand-400)">75,443</span><span class="sim-result-delta up">▲ +23,013</span></div>
+      <div class="sim-result-row"><span class="sim-result-name">3. G. Colapinto</span><span class="sim-result-pts">72,100</span><span class="sim-result-delta down">▼ -1</span></div>
+      <div class="sim-result-row"><span class="sim-result-name">4. E. Ewing</span><span class="sim-result-pts">68,750</span><span class="sim-result-delta up">▲ +2</span></div>
+    </div>
+    <div class="sim-card" style="border-color:rgba(249,115,22,0.2);background:rgba(249,115,22,0.03)">
+      <div class="sim-card-title">🔥 Key Insight</div>
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6">
+        If <strong style="color:var(--text-primary)">Medina</strong> finishes 3rd in Tahiti and Pipe, he secures a post-season spot but needs <strong style="color:var(--brand-400)">Florence to finish 5th or worse</strong> in at least one remaining event to keep title hopes alive.
+      </p>
+    </div>
+  </div>
+
+  <!-- CALENDAR PAGE -->
+  <div class="page" id="page-calendar">
+    <div class="calendar-header">
+      <div class="calendar-title">2026 CT Calendar</div>
+      <div class="calendar-subtitle">12 events · 7 completed · 5 remaining</div>
+    </div>
+    <div id="calendarList"></div>
+  </div>
+
+  <nav class="bottom-nav mobile-only" id="bottomNav">
+    <button class="nav-item active" data-page="rankings"><span class="nav-icon">🏆</span><span class="nav-label">Rankings</span></button>
+    <button class="nav-item" data-page="simulator"><span class="nav-icon">📊</span><span class="nav-label">Simulator</span></button>
+    <button class="nav-item" data-page="calendar"><span class="nav-icon">📅</span><span class="nav-label">Calendar</span></button>
+    <button class="nav-item" data-page="more"><span class="nav-icon">⋯</span><span class="nav-label">More</span></button>
+  </nav>
+</div>
+
+<!-- SURFER MODAL -->
+<div class="modal-overlay" id="surferModal" onclick="closeModal(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-surfer-header">
+      <div class="modal-avatar" id="modalAvatar">JF</div>
+      <div>
+        <div class="modal-name" id="modalName">John John Florence</div>
+        <div class="modal-country" id="modalCountry">🇺🇸 Hawaii, USA</div>
+      </div>
+    </div>
+    <div class="modal-stats">
+      <div class="modal-stat"><div class="modal-stat-value" id="modalPoints">58,165</div><div class="modal-stat-label">Total Pts</div></div>
+      <div class="modal-stat"><div class="modal-stat-value" id="modalRank">#1</div><div class="modal-stat-label">Rank</div></div>
+      <div class="modal-stat"><div class="modal-stat-value" id="modalBest">1st</div><div class="modal-stat-label">Best Result</div></div>
+    </div>
+    <div class="modal-scenarios">
+      <div class="modal-scenario-title">Scenario Probabilities</div>
+      <div class="scenario-bar"><div class="scenario-bar-header"><span class="scenario-bar-label">Win World Title</span><span class="scenario-bar-value" style="color:var(--status-classified)">72%</span></div><div class="scenario-bar-track"><div class="scenario-bar-fill high" style="width:72%"></div></div></div>
+      <div class="scenario-bar"><div class="scenario-bar-header"><span class="scenario-bar-label">Make Post-Season</span><span class="scenario-bar-value" style="color:var(--status-classified)">98%</span></div><div class="scenario-bar-track"><div class="scenario-bar-fill high" style="width:98%"></div></div></div>
+      <div class="scenario-bar"><div class="scenario-bar-header"><span class="scenario-bar-label">Requalify for 2027</span><span class="scenario-bar-value" style="color:var(--status-classified)">99%</span></div><div class="scenario-bar-track"><div class="scenario-bar-fill high" style="width:99%"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const surfers = [
+  { name: "John John Florence", short: "JF", country: "🇺🇸 HAW", pts: 58165, change: 0, status: "classified", best: "1st", title: 72, postSeason: 98, requalify: 99 },
+  { name: "Gabriel Medina", short: "GM", country: "🇧🇷 BRA", pts: 52430, change: 2, status: "classified", best: "1st", title: 45, postSeason: 95, requalify: 97 },
+  { name: "Griffin Colapinto", short: "GC", country: "🇺🇸 USA", pts: 49850, change: -1, status: "classified", best: "2nd", title: 28, postSeason: 92, requalify: 96 },
+  { name: "Ethan Ewing", short: "EE", country: "🇦🇺 AUS", pts: 47320, change: 1, status: "classified", best: "1st", title: 18, postSeason: 88, requalify: 94 },
+  { name: "Kanoa Igarashi", short: "KI", country: "🇯🇵 JPN", pts: 45100, change: -2, status: "classified", best: "2nd", title: 12, postSeason: 85, requalify: 92 },
+  { name: "Jack Robinson", short: "JR", country: "🇦🇺 AUS", pts: 43750, change: 0, status: "classified", best: "1st", title: 8, postSeason: 82, requalify: 90 },
+  { name: "Italo Ferreira", short: "IF", country: "🇧🇷 BRA", pts: 41200, change: 3, status: "classified", best: "2nd", title: 5, postSeason: 78, requalify: 88 },
+  { name: "Filipe Toledo", short: "FT", country: "🇧🇷 BRA", pts: 38900, change: -1, status: "risk", best: "3rd", title: 3, postSeason: 65, requalify: 80 },
+  { name: "Jordy Smith", short: "JS", country: "🇿🇦 RSA", pts: 36400, change: 0, status: "risk", best: "3rd", title: 1, postSeason: 52, requalify: 72 },
+  { name: "Connor O'Leary", short: "CO", country: "🇦🇺 AUS", pts: 34100, change: -2, status: "risk", best: "5th", title: 0, postSeason: 38, requalify: 60 },
+  { name: "Yago Dora", short: "YD", country: "🇧🇷 BRA", pts: 31800, change: 1, status: "risk", best: "3rd", title: 0, postSeason: 25, requalify: 48 },
+  { name: "Samuel Pupo", short: "SP", country: "🇧🇷 BRA", pts: 28500, change: -1, status: "eliminated", best: "9th", title: 0, postSeason: 8, requalify: 30 },
+  { name: "Jake Marshall", short: "JM", country: "🇺🇸 USA", pts: 25200, change: 0, status: "eliminated", best: "9th", title: 0, postSeason: 2, requalify: 15 },
+];
+
+const events = [
+  { num: 1, name: "Pipeline Pro", location: "Oahu, Hawaii", date: "Jan 29 — Feb 10", status: "completed" },
+  { num: 2, name: "Sunset Open", location: "Oahu, Hawaii", date: "Feb 14 — 25", status: "completed" },
+  { num: 3, name: "Peniche Pro", location: "Peniche, Portugal", date: "Mar 12 — 22", status: "completed" },
+  { num: 4, name: "Bells Beach Classic", location: "Victoria, Australia", date: "Apr 9 — 19", status: "completed" },
+  { num: 5, name: "Margaret River Pro", location: "Western Australia", date: "Apr 23 — May 3", status: "completed" },
+  { num: 6, name: "Rio Pro", location: "Saquarema, Brazil", date: "Jun 14 — 22", status: "completed" },
+  { num: 7, name: "El Salvador Pro", location: "La Libertad", date: "Jun 27 — Jul 6", status: "completed" },
+  { num: 8, name: "Tahiti Pro", location: "Teahupo'o, Tahiti", date: "Aug 8 — 18", status: "live" },
+  { num: 9, name: "Trestles Pro", location: "San Clemente, CA", date: "Sep 9 — 16", status: "upcoming" },
+  { num: 10, name: "Abu Dhabi Surf", location: "Abu Dhabi, UAE", date: "Oct 4 — 11", status: "upcoming", note: "Post-Season" },
+  { num: 11, name: "Ericeira Masters", location: "Ericeira, Portugal", date: "Oct 18 — 25", status: "upcoming", note: "Post-Season" },
+  { num: 12, name: "Pipe Masters", location: "Pipeline, Oahu", date: "Dec 8 — 20", status: "upcoming", pipeline: true },
+];
+
+function renderRankings() {
+  const list = document.getElementById('rankingList');
+  let html = '';
+  surfers.forEach((s, i) => {
+    if (i < 3) return;
+    const rank = i + 1;
+    const changeIcon = s.change > 0 ? '▲' : s.change < 0 ? '▼' : '—';
+    const changeClass = s.change > 0 ? 'up' : s.change < 0 ? 'down' : 'same';
+    const changeVal = s.change !== 0 ? Math.abs(s.change) : '';
+    html += `<div class="ranking-row" onclick="openSurfer(${i})">
+      <div class="rank-number">#${rank}</div>
+      <div class="rank-avatar">${s.short}</div>
+      <div class="rank-info"><div class="rank-name">${s.name}</div><div class="rank-meta"><span class="rank-country">${s.country}</span></div></div>
+      <div class="rank-right"><div class="rank-points">${s.pts.toLocaleString()}</div><div style="display:flex;align-items:center;gap:6px;"><span class="rank-change ${changeClass}">${changeIcon} ${changeVal}</span><span class="rank-status ${s.status}">${s.status === 'classified' ? '✓ Safe' : s.status === 'risk' ? '⚠ Risk' : '✗ Out'}</span></div></div>
+    </div>`;
+    if (rank === 7) html += `<div class="ad-infeed"><div class="ad-infeed-img">🏄</div><div class="ad-infeed-content"><div class="ad-infeed-label">Sponsored</div><div class="ad-infeed-title">New boards from Channel Islands</div><div class="ad-infeed-desc">Check the latest performance shortboards →</div></div></div>`;
+  });
+  list.innerHTML = html;
+}
+
+function renderCalendar() {
+  const list = document.getElementById('calendarList');
+  let html = '';
+  events.forEach(e => {
+    const cc = e.status === 'live' ? 'live' : e.pipeline ? 'pipeline' : '';
+    const bc = e.pipeline ? 'pipeline-badge' : e.status;
+    const bt = e.pipeline ? '🌊 1.5× FINALE' : e.status === 'live' ? '⚡ LIVE' : e.status === 'completed' ? 'Done' : e.note || 'Upcoming';
+    html += `<div class="event-card ${cc}"><div class="event-number">${e.num}</div><div class="event-info"><div class="event-name">${e.name}</div><div class="event-location">${e.location}</div><div class="event-date">${e.date}</div></div><span class="event-badge ${bc}">${bt}</span></div>`;
+  });
+  list.innerHTML = html;
+}
+
+function switchPage(pageName) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.desktop-nav-item').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('page-' + pageName);
+  if (page) page.classList.add('active');
+  document.querySelectorAll(`.nav-item[data-page="${pageName}"]`).forEach(n => n.classList.add('active'));
+  document.querySelectorAll(`.desktop-nav-item[data-page="${pageName}"]`).forEach(n => n.classList.add('active'));
+}
+
+document.getElementById('bottomNav').addEventListener('click', e => { const item = e.target.closest('.nav-item'); if (item) switchPage(item.dataset.page); });
+document.getElementById('desktopNav')?.addEventListener('click', e => { const item = e.target.closest('.desktop-nav-item'); if (item) switchPage(item.dataset.page); });
+
+document.querySelectorAll('.pill-group').forEach(group => {
+  group.addEventListener('click', e => { const pill = e.target.closest('.pill'); if (!pill) return; group.querySelectorAll('.pill').forEach(p => p.classList.remove('active')); pill.classList.add('active'); });
+});
+
+function openSurfer(index) {
+  const s = surfers[index];
+  document.getElementById('modalAvatar').textContent = s.short;
+  document.getElementById('modalName').textContent = s.name;
+  document.getElementById('modalCountry').textContent = s.country;
+  document.getElementById('modalPoints').textContent = s.pts.toLocaleString();
+  document.getElementById('modalRank').textContent = '#' + (index + 1);
+  document.getElementById('modalBest').textContent = s.best;
+  const bars = document.querySelectorAll('.scenario-bar');
+  [s.title, s.postSeason, s.requalify].forEach((pct, i) => {
+    const fill = bars[i].querySelector('.scenario-bar-fill');
+    const val = bars[i].querySelector('.scenario-bar-value');
+    fill.style.width = pct + '%';
+    fill.className = 'scenario-bar-fill ' + (pct >= 70 ? 'high' : pct >= 30 ? 'medium' : 'low');
+    val.textContent = pct + '%';
+    val.style.color = pct >= 70 ? 'var(--status-classified)' : pct >= 30 ? 'var(--status-risk)' : 'var(--status-eliminated)';
+  });
+  document.getElementById('surferModal').classList.add('open');
+}
+
+function closeModal(e) { if (e.target === document.getElementById('surferModal')) document.getElementById('surferModal').classList.remove('open'); }
+function updateSimulation() { document.querySelectorAll('.sim-result-pts').forEach(el => { el.style.animation = 'none'; el.offsetHeight; el.style.animation = 'score-count 400ms ease-out'; }); }
+
+renderRankings();
+renderCalendar();
+</script>
+
+</body>
+</html>
