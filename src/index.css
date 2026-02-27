@@ -1,0 +1,157 @@
+@import "tailwindcss";
+
+/* ============================================================
+   DESIGN SYSTEM — Ocean Dark
+   Tokens do design/04-Design-System.md
+   ============================================================ */
+
+@theme {
+  /* --- Colors: Backgrounds --- */
+  --color-surface: #0b1120;
+  --color-surface-card: #111827;
+  --color-surface-input: #1e293b;
+  --color-surface-modal: #1a2744;
+
+  /* --- Colors: Brand (azul oceano) --- */
+  --color-brand-300: #7dd3fc;
+  --color-brand-400: #38bdf8;
+  --color-brand-500: #0ea5e9;
+  --color-brand-600: #0284c7;
+
+  /* --- Colors: Accent --- */
+  --color-accent: #f97316;
+  --color-accent-amber: #fbbf24;
+
+  /* --- Colors: Status --- */
+  --color-classified: #10b981;
+  --color-risk: #f59e0b;
+  --color-eliminated: #ef4444;
+  --color-locked: #6b7280;
+
+  /* --- Colors: Text --- */
+  --color-text-1: #f8fafc;
+  --color-text-2: #94a3b8;
+  --color-text-3: #64748b;
+  --color-text-muted: #475569;
+
+  /* --- Colors: Ranking medals --- */
+  --color-gold: #ffd700;
+  --color-silver: #c0c0c0;
+  --color-bronze: #cd7f32;
+
+  /* --- Border radius (override Tailwind defaults) --- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+}
+
+/* ============================================================
+   CSS CUSTOM PROPERTIES — Design System aliases
+   Usados diretamente em CSS (var(--bg-primary), etc.)
+   ============================================================ */
+
+:root {
+  /* Backgrounds */
+  --bg-primary: #0b1120;
+  --bg-secondary: #111827;
+  --bg-tertiary: #1e293b;
+  --bg-elevated: #1a2744;
+
+  /* Brand */
+  --brand-300: #7dd3fc;
+  --brand-400: #38bdf8;
+  --brand-500: #0ea5e9;
+  --brand-600: #0284c7;
+
+  /* Accent */
+  --accent-primary: #f97316;
+  --accent-secondary: #fbbf24;
+
+  /* Status */
+  --status-classified: #10b981;
+  --status-risk: #f59e0b;
+  --status-eliminated: #ef4444;
+  --status-live: #ef4444;
+  --status-locked: #6b7280;
+
+  /* Text */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-tertiary: #64748b;
+  --text-muted: #475569;
+
+  /* Ranking medals */
+  --rank-gold: #ffd700;
+  --rank-silver: #c0c0c0;
+  --rank-bronze: #cd7f32;
+
+  /* Gradients */
+  --gradient-brand: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 50%, #0ebbf3 100%);
+  --gradient-hot: linear-gradient(135deg, #f97316 0%, #ef4444 100%);
+  --gradient-card: linear-gradient(180deg, #1a2744 0%, #111827 100%);
+  --gradient-podium: linear-gradient(180deg, rgba(14, 165, 233, 0.15) 0%, transparent 100%);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(14, 165, 233, 0.15);
+
+  /* Transitions */
+  --transition-fast: 150ms ease-out;
+  --transition-base: 250ms ease-in-out;
+  --transition-slow: 400ms ease-in-out;
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+
+html {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Tabular numbers — crítico para scores e rankings */
+  font-feature-settings: 'tnum';
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+
+@keyframes pulse-live {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes rank-change {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes score-count {
+  from {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
